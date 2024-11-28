@@ -11,6 +11,10 @@ namespace Day_1
     {
         static void Main(string[] args)
         {
+            string[] lines = File.ReadAllLines("input.txt");
+            int answer = 0;
+            Console.WriteLine(answer);
+            Console.ReadKey();
         }
     }
 }
