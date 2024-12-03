@@ -12,8 +12,6 @@ namespace Day_1
         static void Main(string[] args)
         {
             string[] lines = File.ReadAllLines("input.txt");
-            int answer = 0;
-            
             List<int> line1 = new List<int>();
             List<int> line2 = new List<int>();
             foreach(string line in lines)
