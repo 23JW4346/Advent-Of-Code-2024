@@ -39,7 +39,7 @@ namespace Day_1
             for(int i = 0; i < line1.Count; i++)
             {
                 int amount = 0;
-                for (int j = 0; j< line2.Count; j++)
+                for (int j = 0; j< line2.Count; i++)
                 {
                     if (line1[i] == line2[j]) amount++;
                 }
