@@ -13,6 +13,7 @@ namespace Day_6
             int answer = SOL1(map);
             Console.WriteLine($"Part 1: {answer}");
             answer = SOL2(map);
+            Console.Clear();
             Console.WriteLine($"Part 2: {answer}");
             Console.ReadKey();
         }
@@ -86,12 +87,9 @@ namespace Day_6
             return false;
         }
 
-        static bool HitEdge((int x, int y) inpos, char[,] map)
-        {
-            if (inpos.x == -1|| inpos.y ==-1 ||
-               inpos.x == map.GetLength(0) || inpos.y == map.GetLength(1)) return true;
-            else return false;
-        }
+        static bool HitEdge((int x, int y) inpos, char[,] map) => (inpos.x == -1 || inpos.y == -1 || inpos.x == map.GetLength(0) || inpos.y == map.GetLength(1));
+
+        
 
         static void ChangeDirection(ref int right, ref int up)
         {
@@ -119,6 +117,7 @@ namespace Day_6
 
         static int SOL2(char[,] map)
         {
+            map = Get2DArray();
             (int x, int y) startpos = (0, 0);
             int i = 0;
             int answer = 0;
@@ -127,6 +126,7 @@ namespace Day_6
                 if (c.ToString() == "^")
                 {
                     startpos = (i / map.GetLength(0), i % map.GetLength(1));
+                    break;
                 }
                 i++;
             }
@@ -142,6 +142,7 @@ namespace Day_6
                         temp = Get2DArray();
                         temp[x, y] = '#';
                         if (Move(startpos, temp)) answer++;
+                        Console.WriteLine(answer);
                     }
                 }
             }
