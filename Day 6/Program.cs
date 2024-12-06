@@ -139,7 +139,7 @@ namespace Day_6
 
                     if (map[x, y] == 'X' && startpos != (x,y))
                     {
-                        temp = Get2DArray();
+                        temp = ResetMap(map);
                         temp[x, y] = '#';
                         if (Move(startpos, temp)) answer++;
                         Console.WriteLine(answer);
@@ -147,6 +147,25 @@ namespace Day_6
                 }
             }
             return answer;
+        }
+
+        static char[,] ResetMap(char[,] map)
+        {
+            char[,] chars = new char[map.GetLength(0), map.GetLength(1)];
+            int i = 0;
+            foreach(char c in map)
+            {
+                if(c == '#')
+                {
+                    chars[i/chars.GetLength(0),i%chars.GetLength(1)] = '#';
+                }
+                else
+                {
+                    chars[i/chars.GetLength(0), i%chars.GetLength(1)] = '.';
+                }
+                i++;
+            }
+            return chars;
         }
     }
 }
