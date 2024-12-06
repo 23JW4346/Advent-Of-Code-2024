@@ -137,7 +137,7 @@ namespace Day_6
                 for(int x = 0;  x < map.GetLength(1); x++)
                 {
 
-                    if (map[x, y] == 'X')
+                    if (map[x, y] == 'X' && startpos != (x,y))
                     {
                         temp = Get2DArray();
                         temp[x, y] = '#';
