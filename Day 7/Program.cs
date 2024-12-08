@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 
@@ -24,9 +25,9 @@ namespace Day_7
             foreach (string line in lines)
             {
                 string[] temp = line.Split(':');
-                string[] temp2 = temp[1].Split(' ');
+                string[] temp2 = temp[1].Split(' ').Skip(1).ToArray();
                 List<long> temp3 = new List<long>();
-                for (int i = 1; i < temp2.Length; i++)
+                for (int i = 0; i < temp2.Length; i++)
                 {
                     temp3.Add(int.Parse(temp2[i]));
                 }
@@ -44,7 +45,6 @@ namespace Day_7
             }    
             return answer;
         }
-
 
         static bool GetOperation(long curVal, long target, List<long> remainingVals, bool part2 = false)
         {

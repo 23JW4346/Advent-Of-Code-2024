@@ -34,12 +34,9 @@ namespace Day_3
                 temp = temp.Remove(indexoflastbracket);
             }
             temp = temp.Replace("(", "").Replace("mul", "");
-            if (Regex.IsMatch(temp, "[1-9][0-9]?[0-9]?\\,[1-9][0-9]?[0-9]?"))
-            {
-                string[] split = temp.Trim().Split(',');
-                num1 = int.Parse(split[0]);
-                num2 = int.Parse(split[1]);
-            }
+            string[] split = temp.Trim().Split(',');
+            num1 = int.Parse(split[0]);
+            num2 = int.Parse(split[1]);
             return num1 * num2;
         }
 

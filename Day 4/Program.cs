@@ -44,7 +44,7 @@ namespace Day_4
             int temp = 0;
             foreach (string s in maybes)
             {
-                if (Regex.IsMatch(s, "XMAS")) temp++;
+                if (s == "XMAS") temp++;
             }
             return temp;
         }
@@ -60,8 +60,8 @@ namespace Day_4
                     {
                         string lefttoright = lines[i - 1][j - 1].ToString() + lines[i][j].ToString() + lines[i + 1][j + 1].ToString();
                         string righttoleft = lines[i - 1][j + 1].ToString() + lines[i][j].ToString() + lines[i + 1][j - 1].ToString();
-                        if ((Regex.IsMatch(lefttoright, "MAS") || Regex.IsMatch(lefttoright, "SAM"))
-                           && (Regex.IsMatch(righttoleft, "MAS") | Regex.IsMatch(righttoleft, "SAM"))) answer++;
+                        if ((Regex.IsMatch(lefttoright, "(MAS)|(SAM)"))
+                           && (Regex.IsMatch(righttoleft, "(MAS)|(SAM)"))) answer++;
                     }
                 }
             }
