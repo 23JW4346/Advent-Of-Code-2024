@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Day_10
 {
@@ -14,7 +15,6 @@ namespace Day_10
             public int height;
         }
 
-        static HashSet<tile> nines = new HashSet<tile> ();
         static void Main(string[] args)
         {
             Console.WriteLine($"Part 1: {SOL1(GetMap())}");
@@ -48,27 +48,15 @@ namespace Day_10
             return map;
         }
 
-        static void PrintMap(tile[,] map)
-        {
-            for (int x = 0; x < map.GetLength(0); x++)
-            {
-                for (int y = 0; y < map.GetLength(1); y++)
-                {
-                    Console.Write(map[x, y].height);
-                }
-                Console.WriteLine();
-            }
-        }
-
         static int SOL1(tile[,] map)
         {
             int answer = 0;
-            //PrintMap(map);
+            HashSet<tile> nines = new HashSet<tile>();
             foreach (tile myTile in map)
             {
                 if (myTile.height == 0)
                 {
-                    CheckAround(map, myTile);
+                    CheckAround(map, myTile, nines);
                     answer += nines.Count;
                     nines.Clear();
                 }
@@ -76,11 +64,11 @@ namespace Day_10
             return answer;
         }
 
-        static void CheckAround(tile[,] map, tile startTile)
+        static void CheckAround(tile[,] map, tile startTile, ICollection<tile> nines)
         {
             if (startTile.height == 9)
             {
-                    nines.Add(startTile);
+                nines.Add(startTile);
             }
             else
             {
@@ -89,7 +77,7 @@ namespace Day_10
                     if (startTile.height + 1 == map[startTile.x, startTile.y - 1].height)
                     {
                         tile temptile = map[startTile.x, startTile.y - 1];
-                        CheckAround(map, temptile);
+                        CheckAround(map, temptile, nines);
                     }
                 }
                 if (startTile.up)
@@ -97,7 +85,7 @@ namespace Day_10
                     if (startTile.height + 1 == map[startTile.x, startTile.y + 1].height)
                     {
                         tile temptile = map[startTile.x, startTile.y + 1];
-                        CheckAround(map, temptile);
+                        CheckAround(map, temptile, nines);
                     }
                 }
                 if (startTile.right)
@@ -105,7 +93,7 @@ namespace Day_10
                     if (startTile.height + 1 == map[startTile.x + 1, startTile.y].height)
                     {
                         tile temptile = map[startTile.x + 1, startTile.y];
-                        CheckAround(map, temptile);
+                        CheckAround(map, temptile, nines);
                     }
                 }
                 if (startTile.left)
@@ -113,7 +101,7 @@ namespace Day_10
                     if (startTile.height + 1 == map[startTile.x - 1, startTile.y].height)
                     {
                         tile temptile = map[startTile.x - 1, startTile.y];
-                        CheckAround(map, temptile);
+                        CheckAround(map, temptile, nines);
                     }
                 }
             }
@@ -121,60 +109,15 @@ namespace Day_10
 
         static int SOL2(tile[,] map)
         {
-            int answer = 0;
+            List<tile> nines = new List<tile>();
             foreach(tile myTile in map)
             {
                 if(myTile.height == 0)
                 {
-                    answer += CheckRating(map, myTile);
+                    CheckAround(map, myTile, nines);
                 }
             }
-            return answer;
-        }
-
-        static int CheckRating(tile[,] map, tile startTile)
-        {
-            int ratingl = 0, ratingd=0, ratingu=0, ratingr=0;
-            if(startTile.height == 9)
-            {
-                return 1;
-            }
-            else
-            {
-                if (startTile.down)
-                {
-                    if(startTile.height+1 == map[startTile.x, startTile.y-1].height)
-                    {
-                        tile temptile = map[startTile.x, startTile.y-1];
-                        ratingd = CheckRating(map, temptile); 
-                    }
-                }
-                if (startTile.up)
-                {
-                    if (startTile.height + 1 == map[startTile.x, startTile.y + 1].height)
-                    {
-                        tile temptile = map[startTile.x, startTile.y + 1];
-                        ratingu = CheckRating(map, temptile);
-                    }
-                }
-                if (startTile.right)
-                {
-                    if (startTile.height + 1 == map[startTile.x+1, startTile.y].height)
-                    {
-                        tile temptile = map[startTile.x+1, startTile.y];
-                        ratingr = CheckRating(map, temptile);
-                    }
-                }
-                if (startTile.left)
-                {
-                    if (startTile.height + 1 == map[startTile.x-1, startTile.y].height)
-                    {
-                        tile temptile = map[startTile.x-1, startTile.y];
-                        ratingl = CheckRating(map, temptile);
-                    }
-                }
-            }
-            return ratingr + ratingd + ratingl + ratingu;
+            return nines.Count;
         }
     }
 }
