@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Policy;
 
 namespace Day_11
 {
@@ -40,11 +41,12 @@ namespace Day_11
             List<long> temp = new List<long>();
             for (int j = 0; j < ints.Count; j++)
             {
+                int length = (int)Math.Floor(Math.Log10(ints[j]) + 1);
                 if (ints[j] == 0) temp.Add(1);
-                else if (ints[j].ToString().Length % 2 == 0)
+                else if (length % 2 == 0)
                 {
-                    long left = long.Parse(ints[j].ToString().Substring(0, ints[j].ToString().Length / 2));
-                    long right = long.Parse(ints[j].ToString().Substring(ints[j].ToString().Length / 2));
+                    long left = (long)(ints[j] / Math.Pow(10, length / 2));
+                    long right = (long)(ints[j] % Math.Pow(10, length / 2)); 
                     temp.Add(left);
                     temp.Add(right);
                 }
@@ -56,53 +58,47 @@ namespace Day_11
             ints = temp;
         }
 
-        static void GetNextStonespt2(ref HashSet<long> stones, ref Dictionary<long, long> counts)
+        static void GetNextStonespt2(ref Dictionary<long, long> counts)
         {
-            HashSet<long> tempstones = new HashSet<long>();
             Dictionary<long, long> tempcounts = new Dictionary<long, long>();
-            foreach (long stone in stones)
+            foreach (long stone in counts.Keys)
             {
                 int length = (int)Math.Floor(Math.Log10(stone) + 1);
-
                 if (stone == 0)
                 {
-                    if (tempstones.Add(1)) tempcounts.Add(1, 0);
+                    if (!tempcounts.ContainsKey(1)) tempcounts.Add(1, 0);
                     tempcounts[1] += counts[stone];
                 }
                 else if (length % 2 == 0)
                 {
-                    var left = (long)(stone / Math.Pow(10, length / 2));
-                    var right = (long)(stone % Math.Pow(10, length / 2));
-                    if (tempstones.Add(left)) tempcounts.Add(left, 0);
+                    long left = (long)(stone / Math.Pow(10, length / 2));
+                    long right = (long)(stone % Math.Pow(10, length / 2));
+                    if (!tempcounts.ContainsKey(left)) tempcounts.Add(left, 0);
                     tempcounts[left] += counts[stone];
-                    if (tempstones.Add(right)) tempcounts.Add(right, 0);
+                    if (!tempcounts.ContainsKey(right)) tempcounts.Add(right, 0);
                     tempcounts[right] += counts[stone];
                 }
                 else
                 {
                     long val = stone * 2024;
-                    if (tempstones.Add(val)) tempcounts.Add(val, 0);
+                    if (!tempcounts.ContainsKey(val)) tempcounts.Add(val, 0);
                     tempcounts[val] += counts[stone];
                 }
             }
-
-            stones = tempstones;
             counts = tempcounts;
         }
 
         static long SOL2(string input)
         {
             string[] strlist = input.Split(' ');
-            HashSet<long> stones = new HashSet<long>();
             Dictionary<long, long> counts = new Dictionary<long, long>();
             foreach (string str in strlist)
             {
-                stones.Add(long.Parse(str));
                 counts.Add(long.Parse(str), 1);
             }
             for (int i = 0; i < 75; i++)
             {
-                GetNextStonespt2(ref stones, ref counts);
+                GetNextStonespt2(ref counts);
             }
             return counts.Values.Sum();
         }
