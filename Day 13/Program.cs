@@ -71,13 +71,13 @@ namespace Day_13
 
         static long SOL1(List<clawMachine> clawMachines)
         {
-            long answer = 0;
+            long coins = 0;
             foreach (clawMachine clawMachine in clawMachines)
             {
                 (long a, long b) temp = GetToXY(clawMachine);
-                answer += temp.a * 3 + temp.b * 1;
+                coins += temp.a * 3 + temp.b * 1;
             }
-            return answer;
+            return coins;
         }
 
         public class Matrix
@@ -121,7 +121,7 @@ namespace Day_13
         static long SOL2(List<clawMachine> machines)
         {
             long offset = 10000000000000;
-            long answer = 0;
+            long coins = 0;
             foreach (clawMachine machine in machines)
             {
                 clawMachine myClaw;
@@ -130,9 +130,9 @@ namespace Day_13
                 myClaw.xans = machine.xans + offset;
                 myClaw.yans = machine.yans + offset;
                 (long a, long b) temp = GetToXY(myClaw);
-                answer += temp.a * 3 + temp.b * 1;
+                coins += temp.a * 3 + temp.b * 1;
             }
-            return answer;
+            return coins;
         }
     }
 }
