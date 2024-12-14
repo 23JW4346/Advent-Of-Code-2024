@@ -15,6 +15,7 @@ namespace Day_13
         public class Matrix
         {
             public long a, b, c, d;
+            
             public Matrix((int x, int y) ina, (int x, int y) inb)
             {
                 a = ina.x;
