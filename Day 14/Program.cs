@@ -11,7 +11,7 @@ namespace Day_14
             public int px, py, vx, vy;
         }
 
-        static int maxx = 101, maxy = 103;
+        const int maxx = 101, maxy = 103;
 
         static void Main(string[] args)
         {
