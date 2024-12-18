@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace Day_16
 {
@@ -11,13 +13,16 @@ namespace Day_16
 
         static void Main(string[] args)
         {
-            Console.WriteLine($"Part 1: {SOL1()}");
+            Console.WriteLine($"Part 1:");
+            Console.WriteLine($"Test 1: {SOL1(GetPuzzleInput("test1.txt"))}");
+            Console.WriteLine($"Test 2: {SOL1(GetPuzzleInput("test2.txt"))}");
+            Console.WriteLine($"Actual: {SOL1(GetPuzzleInput("input.txt"))}");
             Console.ReadKey();
         }
 
-        static char[,] GetPuzzleInput()
+        static char[,] GetPuzzleInput(string filename)
         {
-            string[] lines = File.ReadAllLines("input.txt");
+            string[] lines = File.ReadAllLines(filename);
             char[,] maze = new char[lines[0].Length, lines.Length];
             for (int i = 0; i < lines.Length; i++)
             {
@@ -29,10 +34,10 @@ namespace Day_16
             return maze;
         }
 
-        static long SOL1()
+        static long SOL1(char[,] maze)
         {
-            char[,] maze = GetPuzzleInput();
-            int mazetraveled = DjikstrasP1(maze);
+            ((int x,int y) start, (int x, int y) end) = FindStartAndEnd(maze);
+            int mazetraveled = BFS(maze, start, end);
             return mazetraveled;
         }
 
@@ -49,72 +54,99 @@ namespace Day_16
             }
         }
 
-        static int DjikstrasP1(char[,] maze)
+        static ((int, int), (int, int)) FindStartAndEnd(char[,] maze)
         {
-            (int x, int y) startNode = (0,0), endNode = (0,0);
-            int[,] bestScores = new int[maze.GetLength(0), maze.GetLength(1)];
-            for (int x = 0; x <  maze.GetLength(0); x++) 
+            (int x, int y) start = (0, 0), end = (0, 0);
+            for (int i = 0; i < maze.GetLength(0); i++)
             {
-                for(int y = 0; y < maze.GetLength(1); y++)
+                for (int j = 0; j < maze.GetLength(1); j++)
                 {
-                    if (maze[x, y] == 'S')
+                    if (maze[i, j] == 'S') // Start point
                     {
-                        startNode = (x, y);
-                        bestScores[x, y] = 0;
+                        start = (i, j);
                     }
-                    else if (maze[x,y] == 'E')
+                    else if (maze[i, j] == 'E') // End point
                     {
-                        endNode = (x, y);
-                        bestScores[x, y] = int.MaxValue;
-                    }
-                    else
-                    {
-                        bestScores[x, y] = int.MaxValue;
+                        start = (i, j);
                     }
                 }
             }
-            (int,int) direction = (1,0);
-            HashSet<(int, int, (int, int))> visited = new HashSet<(int, int, (int, int))>();
-            Queue<(int x, int y, (int,int) d, int distance)> myQueue = new Queue<(int, int, (int,int), int)>();
-            myQueue.Enqueue((startNode.x, startNode.y, direction, 0));
-            while(myQueue.Count > 0 )
+            return (start, end);
+        }
+
+        static int BFS(char[,] maze, (int x, int y) start, (int x, int y) end)
+        {
+            int rows = maze.GetLength(0);
+            int cols = maze.GetLength(1);
+
+            (int, int)[] directions = { (1, 0), (0, -1), (-1, 0), (0, -1) };
+            // Distance matrix to keep track of the shortest distance from the start
+            int[,] distance = new int[rows, cols];
+            for(int x = 0; x < rows; x++)
             {
-                (int x, int y, (int,int) d, int distance) = myQueue.Dequeue();
-                if (visited.Add((x, y, d)))
+                for(int y = 0; y < cols; y++)
                 {
-                    bool reachedEnd = false;
-                    (int x, int y) myPoint = (x + d.Item1, y + d.Item2);
-                    if (maze[myPoint.x, myPoint.y] == '.')
+                    distance[x, y] = int.MaxValue;
+                }
+            }
+            bool[,,] visited = new bool[rows, cols, directions.Length]; // To track visited cells
+            (int, int)[,] parent = new (int, int)[rows, cols]; // For path reconstruction
+
+            Queue<((int, int),(int ,int)) > queue = new Queue<((int, int), (int, int))>();
+            queue.Enqueue((start, directions[0]));
+            visited[start.x, start.y,3] = true;
+            distance[start.x, start.y] = 0;
+
+            // BFS traversal
+            while (queue.Count > 0)
+            {
+                ((int, int) current, (int x, int y) direction) = queue.Dequeue();
+                // If we reach the end point
+                if (current == end)
+                {
+                    PrintPath(parent, end.x, end.y);
+                }
+                int x = current.Item1;
+                int y = current.Item2;
+
+                // Explore Neighbours
+                for (int i = 0; i < 4; i += 1)
+                {
+                    (int x, int y) d = directions[(Array.IndexOf(directions, direction) + 1) % 4];
+                    int nx = x + d.x;
+                    int ny = y + d.y;
+                    if(d == (-direction.x, -direction.y))
+                    // check if new position isn't in the wall and not visited
+                    if (maze[nx, ny] != '#' && !visited[nx, ny,Array.IndexOf(directions,d)])
                     {
-                        myQueue.Enqueue((myPoint.x, myPoint.y, d, distance + 1));
-                    }
-                    else if (myPoint == endNode)
-                    {
-                        reachedEnd = true;
-                    }
-                    if (maze[x,y] != '#')
-                    {
-                        if (bestScores[myPoint.x, myPoint.y] > distance + 1) bestScores[myPoint.x, myPoint.y] = distance + 1;
-                    }
-                    if (!reachedEnd)
-                    {
-                        if(d.Item1 !=0 )
-                        {
-                            if (maze[x, y + 1] != '#') myQueue.Enqueue((x, y, (0, 1), distance + 1000));
-                            if (maze[x, y - 1] != '#') myQueue.Enqueue((x, y, (0, -1), distance + 1000));
-                        }
-                        else
-                        {
-                            if (maze[x + 1, y] != '#') myQueue.Enqueue((x, y, (1, 0), distance + 1000));
-                            if (maze[x - 1, y] != '#') myQueue.Enqueue((x, y, (-1, 0), distance + 1000));
-                        }
+                        visited[nx, ny, Array.IndexOf(directions, d)] = true;
+                        if (distance[nx, ny] > distance[x, y] + 1) distance[nx, ny] = distance[x, y] + 1;
+                        parent[nx, ny] = (x, y);
+                        queue.Enqueue(((nx, ny), d));
                     }
                 }
-                Print(maze, (x, y));
-                System.Threading.Thread.Sleep(100);
-                Console.Clear();
             }
-            return bestScores[endNode.x, endNode.y];
+
+            return distance[end.x, end.y];
+        }
+
+        static void PrintPath((int, int)[,] parent, int endX, int endY)
+        {
+            List<string> path = new List<string>();
+            (int, int) current = (endX, endY);
+
+            while (current != (-1,-1))
+            {
+                path.Add($"({current.Item1}, {current.Item2})");
+                current = parent[current.Item1, current.Item2];
+            }
+
+            path.Reverse();
+            Console.WriteLine("Shortest Path: ");
+            foreach (var step in path)
+            {
+                Console.WriteLine(step);
+            }
         }
     }
 }
