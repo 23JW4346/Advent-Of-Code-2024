@@ -27,9 +27,6 @@ namespace Day_16_2nd_try
 
             public T Dequeue()
             {
-                if (elements.Count == 0)
-                    throw new InvalidOperationException("The priority queue is empty.");
-
                 var bestItem = elements[0].item;
                 elements.RemoveAt(0);
                 return bestItem;
@@ -63,18 +60,6 @@ namespace Day_16_2nd_try
         {
             ((int, int) start, (int, int) end) = FindStartEnd(maze);
             int result = BFS2(maze, start, end);
-            if(result > 100)
-            {
-                string[] print = new string[maze.GetLength(0)];
-                for(int x = 0; x < maze.GetLength(0); x++)
-                {
-                    for(int y = 0; y < maze.GetLength(1); y++)
-                    {
-                        print[x] += maze[x, y];
-                    }
-                }
-                File.WriteAllLines("output.txt", print);
-            }
             return result;
         }
 
@@ -85,15 +70,7 @@ namespace Day_16_2nd_try
             for (int i = 0; i < lines.Length; i++)
                 for (int j = 0; j < lines[i].Length; j++)
                     maze[j, i] = lines[i][j];
-
             return maze;
-        }
-
-        static void Print(char[,] map)
-        {
-            for(int x= 0; x < map.GetLength(0); x++)
-                for(int y = 0;  y < map.GetLength(1); y++)
-                    Console.Write(map[y, x] + (y == map.GetLength(1)-1? "\n":""));
         }
 
         static int BFS(char[,] map, (int x,int y) startPos, (int x,int y) endPos, HashSet<(int,int,Direction)> seen, int[,] costs, ref Direction dIn) 
@@ -122,17 +99,13 @@ namespace Day_16_2nd_try
                 int nx = x + dxy[(int)dir].x;
                 int ny = y + dxy[(int)dir].y;
                 if (IsValidMove(nx, ny, map) && !seen.Contains((nx, ny, dir)))
-                {
                     myQueue.Enqueue((nx, ny, dir, score + 1), score + 1);
-                }
-
+                
                 for (int i = 1; i <= 3; i++)
                 {
                     Direction newDir = (Direction)(((int)dir + i) % 4);
                     if (!seen.Contains((x, y, newDir)))
-                    {
                         myQueue.Enqueue((x, y, newDir, score + 1000), score + 1000);
-                    }
                 }
             }
             return costs[endPos.x, endPos.y];
@@ -195,34 +168,7 @@ namespace Day_16_2nd_try
                         bestPaths.Add((x, y));
                 }
             }
-            foreach((int x, int y) in bestPaths)
-            {
-                map[x, y] = 'X';
-            }
-            Print(map);
             return bestPaths.Count;
-        }
-
-        static void MarkBestPaths(int x, int y, int cost, int[,] costs, char[,] map, List<(int, int)> bestPaths, HashSet<(int, int, Direction)> seen)
-        {
-            if (cost == int.MaxValue || costs[x, y] != cost)
-                return;
-            bestPaths.Add((x, y));
-            (int x, int y)[] dxy = { (1, 0), (0, 1), (-1, 0), (0, -1) };
-            for (int i = 0; i < 4; i++)
-            {
-                int nx = x - dxy[i].x;
-                int ny = y - dxy[i].y;
-                Direction prevDir = (Direction)i;
-                if (IsValidMove(nx, ny, map) && seen.Contains((nx, ny, prevDir)))
-                {
-                    if (costs[nx, ny] == cost - 1)
-                        MarkBestPaths(nx, ny, cost - 1, costs, map, bestPaths, seen);
-
-                    else if (costs[nx, ny] == cost - 1001)
-                        MarkBestPaths(nx, ny, cost - 1001, costs, map, bestPaths, seen);
-                }
-            }
         }
     }
 }

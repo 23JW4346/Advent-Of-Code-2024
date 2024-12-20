@@ -40,7 +40,6 @@ namespace Day_19
             foreach (string towel in towel_toGet)
                 if (CanGetTowel(towel, solved) > 0)
                     answer++;
-
             return answer;
         }
 
@@ -51,7 +50,6 @@ namespace Day_19
             Dictionary<string, long> solved = new Dictionary<string, long>();
             foreach (string towel in towels)
                 answer += CanGetTowel(towel, solved);
-
             return answer;
         }
 
